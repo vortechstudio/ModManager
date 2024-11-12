@@ -76,8 +76,8 @@
                                         <span class="menu-title">Nouveau Mod</span>
                                     </a>
                                 </div>
-                                <div class="menu-item">
-                                    <a class="menu-link" href="" wire:navigate>
+                                <div class="menu-item {{ Route::is('mod-selector', 'edit-mod') ? 'here' : '' }}">
+                                    <a class="menu-link" href="{{ route('mod-selector') }}" wire:navigate>
                                         <span class="menu-icon">
                                             <i class="ki-duotone ki-pencil fs-2"><span class="path1"></span><span class="path2"></span></i>
                                         </span>
