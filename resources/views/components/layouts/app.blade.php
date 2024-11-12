@@ -9,7 +9,6 @@
         <link rel="stylesheet" href="{{ asset('assets/plugins/global/plugins.bundle.css') }}">
         <link rel="stylesheet" href="{{ asset('assets/css/style.bundle.css') }}">
         @vite('resources/css/app.css')
-        @livewireStyles
     </head>
     <body id="kt_app_body" data-kt-app-header-fixed-mobile="true" data-kt-app-toolbar-enabled="true" class="app-default">
     <!--begin::Theme mode setup on page load-->
@@ -69,8 +68,8 @@
                                         <span class="menu-title">Tableau de Bord</span>
                                     </a>
                                 </div>
-                                <div class="menu-item">
-                                    <a class="menu-link" href="" wire:navigate>
+                                <div class="menu-item {{ Route::is('create-mod') ? 'here' : '' }}">
+                                    <a class="menu-link" href="{{ route('create-mod') }}" wire:navigate>
                                         <span class="menu-icon">
                                             <i class="ki-duotone ki-plus-circle fs-2"><span class="path1"></span><span class="path2"></span></i>
                                         </span>
@@ -210,7 +209,6 @@
     <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
     <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
     @vite('resources/js/app.js')
-    @livewireScripts
     @yield("scripts")
     <!--end::Global Javascript Bundle-->
     <!--end::Javascript-->

@@ -15,3 +15,4 @@ use Illuminate\Support\Facades\Route;
 Route::get('/start', \App\Livewire\Core\Start::class)->name('start');
 Route::get('/', \App\Livewire\Home::class)->name('home');
 Route::get('/core/configuration', \App\Livewire\Core\Configuration::class)->name('configuration');
+Route::get('/create-mod', \App\Livewire\CreateMod::class)->name('create-mod');
