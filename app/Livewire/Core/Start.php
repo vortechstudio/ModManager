@@ -32,19 +32,33 @@ class Start extends Component
 
         // Vérification des dépendances
         if($configManager->checkDependencies()) {
-            Window::open('main')
-                ->route('home')
-                ->width(1200)
-                ->height(730)
-                ->title(config('app.name'))
-                ->hideMenu();
-            Window::close('starting');
+            $this->dispatch('create-folder');
         } else {
             flash()->addError("Erreur lors de la mise à jours...");
         }
 
         // Fermer la fenêtre actuelle et ouvrir la principale
 
+    }
+
+    #[On('create-folder')]
+    public function createFolder()
+    {
+        if(!\File::exists(storage_path("/app/public/temp_modding"))) {
+            \File::makeDirectory(storage_path("/app/public/temp_modding"), 0777, true);
+        }
+        $this->dispatch('starting-main');
+    }
+
+    #[On('starting-main')]
+    public function startingMain()
+    {
+        Window::open('main')
+            ->width(1280)
+            ->height(720)
+            ->route('home')
+            ->hideMenu();
+        Window::close('starting');
     }
 
     public function render()
