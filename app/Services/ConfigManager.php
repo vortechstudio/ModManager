@@ -178,6 +178,14 @@ class ConfigManager
         }
     }
 
-
+    public static function getActualVersion(string $software)
+    {
+        return match ($software) {
+            "imagemagick" => File::get('/public/bin/imagemagick/version'),
+            "blender" => File::get('/public/bin/blender/version'),
+            "lua" => File::get('/public/bin/lua/version'),
+            "modvalidator" => File::get('/public/bin/mod_validator/version'),
+        };
+    }
 
 }
