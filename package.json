@@ -1,4 +1,5 @@
 {
+    "name": "mod-manager",
     "private": true,
     "type": "module",
     "scripts": {
