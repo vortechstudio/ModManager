@@ -1,3 +1,7 @@
+@section('css')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css" />
+@endsection
+
 <form wire:submit="createMod">
     <div class="alert alert-dismissible bg-light-primary border border-primary  d-flex flex-column flex-sm-row w-100 p-5 mb-10">
         <!--begin::Icon-->
@@ -36,7 +40,25 @@
                     </div>
                 </div>
             </div>
-            <div class="mb-5">
+            <div class="row mb-5">
+                <div class="col">
+                    <label for="" class="form-label require">Severity Add</label>
+                    <select wire:model="severityAdd" class="form-select">
+                        <option value="NONE">NONE</option>
+                        <option value="WARNING">WARNING</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                    </select>
+                </div>
+                <div class="col">
+                    <label for="" class="form-label require">Severity Remove</label>
+                    <select wire:model="severityRemove" class="form-select">
+                        <option value="NONE">NONE</option>
+                        <option value="WARNING">WARNING</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-5" wire:ignore>
                 <label for="" class="form-label required">Description du mod</label>
                 <textarea name="description" id="description" class="form-control" cols="30" rows="10" wire:model="description" required></textarea>
             </div>
@@ -49,5 +71,19 @@
     </div>
 </form>
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('Livewire Start & Load...')
+            let simplemde = new SimpleMDE({
+                element: document.getElementById('description'),
+                spellChecker: false,
+                initialValue: "{{ $description }}"
+            })
 
+            simplemde.codemirror.on("change", function(){
+                @this.set('description', simplemde.value());
+            });
+        })
+    </script>
 @endsection

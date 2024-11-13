@@ -15,6 +15,8 @@ class CreateMod extends Component
     public string $nameMod = '';
     public string $authors = '';
     public string $tags = '';
+    public string $severityAdd = '';
+    public string $severityRemove = '';
     public string $description = '';
 
     public function mount()
@@ -38,8 +40,7 @@ class CreateMod extends Component
         }
 
         $this->createModDirectory($name_mod);
-        $this->createModLuaFile($name_mod);
-        $this->createStringLuaFile($name_mod, $mod_title);
+        $this->createModJsonFile($name_mod, $mod_title);
         $this->createImageTgaFile($name_mod);
 
         flash()->addSuccess("Mod Créer avec succès");
@@ -65,86 +66,55 @@ class CreateMod extends Component
         }
     }
 
-    public function createModLuaFile(string $name_mod)
-    {
-        // Transformation des auteurs en format Lua avec `name` et `role`
-        $authorsArray = array_map('trim', explode(',', $this->authors));
-        $authorsLua = implode(",\n                ", array_map(function($author) {
-            list($name, $role) = array_map('trim', explode(':', $author));
-            return "{
-                    name = \"$name\",
-                    role = \"$role\"
-                }";
-        }, $authorsArray));
-
-        // Transformation des tags en tableau Lua
-        $tagsArray = array_map('trim', explode(',', $this->tags));
-        $tagsLua = "tags = { \"" . implode('", "', $tagsArray) . "\" },";
-
-        // Génération du contenu de `mod.lua`
-        $content = <<<LUA
-function data()
-return {
-        info = {
-            minorVersion = 0,
-            severityAdd = 'NONE',
-            severityRemove = 'NONE',
-            name = _("NAME_MOD"),
-            description = _("DESC_MOD"),
-            authors = {
-                $authorsLua
-            },
-            $tagsLua
-            visible = true,
-        }
-    }
-end
-LUA;
-
-        $filePath = storage_path('/app/public/temp_modding') . '/' . $name_mod . '/mod.lua';
-        File::put($filePath, $content);
-    }
-
-    public function createStringLuaFile(string $name_mod, string $mod_title)
-    {
-        $translator = new Translator();
-        if ($translator->testApi()) {
-            $titleEN = $translator->translate($mod_title, 'fr', 'en');
-            $titleDE = $translator->translate($mod_title, 'fr', 'de');
-            $descriptionEN = $translator->translate($this->description, 'fr', 'en');
-            $descriptionDE = $translator->translate($this->description, 'fr', 'de');
-        } else {
-            $titleEN = $titleDE = $mod_title;
-            $descriptionEN = $descriptionDE = $this->description;
-        }
-
-        $content = <<<LUA
-function data()
-    return {
-        fr = {
-            ["NAME_MOD"] = "$mod_title",
-            ["DESC_MOD"] = "{$this->description}",
-        },
-        en = {
-            ["NAME_MOD"] = "$titleEN",
-            ["DESC_MOD"] = "$descriptionEN",
-        },
-        de = {
-            ["NAME_MOD"] = "$titleDE",
-            ["DESC_MOD"] = "$descriptionDE",
-        },
-    }
-end
-LUA;
-
-        $filePath = storage_path('/app/public/temp_modding') . '/' . $name_mod . '/strings.lua';
-        File::put($filePath, $content);
-    }
-
     public function createImageTgaFile(string $name_mod)
     {
         $outputPath = storage_path('/app/public/temp_modding') . '/' . $name_mod . '/image_00.tga';
         $command = "\"{$this->magicCmd}\" -size 512x512 xc:white \"{$outputPath}\"";
         exec($command);
+    }
+
+    private function createModJsonFile(string $name_mod, string $mod_title)
+    {
+        $translator = new Translator();
+        $data = collect();
+
+        $translation = collect()->push([
+            'fr' => [
+                'NAME_MOD' => $mod_title,
+                'DESC_MOD' => $this->description,
+            ],
+            'en' => [
+                'NAME_MOD' => $translator->translate($mod_title, 'fr', 'en'),
+                'DESC_MOD' => $translator->translate($this->description, 'fr', 'en'),
+            ],
+            'de' => [
+                'NAME_MOD' => $translator->translate($mod_title, 'fr', 'de'),
+                'DESC_MOD' => $translator->translate($this->description, 'fr', 'de'),
+            ]
+        ]);
+
+        $authorsArray = array_map(function($author) {
+            list($name, $role) = array_map('trim', explode(':', $author));
+            return ['name' => $name, 'role' => $role];
+        }, array_map('trim', explode(',', $this->authors)));
+
+        $tagsArray = array_map('trim', explode(',', $this->tags));
+
+        $data->push([
+            'info' => [
+                'minorVersion' => 0,
+                'severityAdd' => $this->severityAdd,
+                'severityRemove' => $this->severityRemove,
+                'name' => 'NAME_MOD',
+                'description' => 'DESC_MOD',
+                'authors' => $authorsArray,
+                'tags' => $tagsArray,
+                'visible' => true,
+            ],
+            'translations' => $translation,
+        ]);
+
+        $filePath = storage_path('/app/public/temp_modding') . '/' . $name_mod.'/mod_data.json';
+        File::put($filePath, json_encode($data->toArray(), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
     }
 }
