@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="{{ asset('assets/plugins/global/plugins.bundle.css') }}">
         <link rel="stylesheet" href="{{ asset('assets/css/style.bundle.css') }}">
         @vite('resources/css/app.css')
+        @yield("css")
     </head>
     <body id="kt_app_body" data-kt-app-header-fixed-mobile="true" data-kt-app-toolbar-enabled="true" class="app-default">
     <!--begin::Theme mode setup on page load-->
